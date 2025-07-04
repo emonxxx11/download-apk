@@ -1,5 +1,5 @@
 const userRawUrl = 'https://raw.githubusercontent.com/emon606-tech/usr/main/user.txt';
-const downloadLink = '/download';  // Note: will point to your backend route
+const downloadLink = '/download'; // Backend route to download the zip file
 
 function startDownload() {
   window.open(downloadLink, '_blank');
@@ -29,7 +29,7 @@ function copyEmail() {
   setTimeout(() => btn.textContent = 'Copy Email', 2000);
 }
 
-// Raining particles setup
+// Rain effect
 const canvas = document.getElementById('rainCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
