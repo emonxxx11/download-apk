@@ -14,7 +14,7 @@
 <main class="container">
   <h1>MissionPay Downloader</h1>
   <p id="user-count">Loading user info...</p>
-  <button class="download-btn" id="downloadBtn">📦 Download Now</button>
+  <button class="download-btn" onclick="startDownload()">📦 Download Now</button>
 </main>
 
 <footer class="footer">
@@ -25,7 +25,7 @@
     <a href="https://www.whatsapp.com/" target="_blank"><img src="icons/whatsapp.png" alt="WhatsApp"></a>
     <a href="https://www.telegram.com/" target="_blank"><img src="icons/telegram.png" alt="Telegram"></a>
     <a href="https://www.discord.com/" target="_blank"><img src="icons/discord.png" alt="Discord"></a>
-    <a href="#" id="gmailIcon"><img src="icons/gmail.png" alt="Gmail"></a>
+    <a href="#" onclick="openEmailModal()"><img src="icons/gmail.png" alt="Gmail"></a>
   </div>
   <div class="copyright">
     &copy; MissionPay 2025. All Rights Reserved.
@@ -35,13 +35,14 @@
 <!-- Email Modal -->
 <div id="emailModal">
   <div id="emailModalContent">
-    <span id="closeModal">&times;</span>
+    <span id="closeModal" onclick="closeEmailModal()">&times;</span>
     <h3>Contact us via Email</h3>
     <div id="emailAddress">islamnafij83@gmail.com</div>
-    <button id="copyBtn">Copy Email</button>
+    <button id="copyBtn" onclick="copyEmail()">Copy Email</button>
   </div>
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
