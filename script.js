@@ -9,7 +9,199 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingScreen.style.display = 'none';
         }, 500);
     }, 2000);
+    
+    // Initialize backend integration
+    initializeBackendIntegration();
 });
+
+// Backend Integration Functions
+async function initializeBackendIntegration() {
+    try {
+        // Update stats from backend
+        await updateStats();
+        
+        // Set up download tracking
+        setupDownloadTracking();
+        
+        console.log('🥇 Backend integration initialized successfully!');
+    } catch (error) {
+        console.error('Error initializing backend integration:', error);
+    }
+}
+
+// Backend URL for GitHub Pages integration
+const BACKEND_URL = 'https://count1.onrender.com';
+
+// Update stats from backend
+async function updateStats() {
+    try {
+        console.log('🥇 Fetching stats from:', `${BACKEND_URL}/api/stats`);
+        const response = await fetch(`${BACKEND_URL}/api/stats`);
+        console.log('🥇 Response status:', response.status);
+        const data = await response.json();
+        console.log('🥇 Backend data:', data);
+        
+        if (data.success) {
+            // Update the stat numbers with real data from backend
+            const downloadElement = document.getElementById('downloadCount');
+            const tkElement = document.getElementById('tkEarned');
+            const tournamentElement = document.getElementById('tournamentCount');
+            
+            if (downloadElement) {
+                downloadElement.setAttribute('data-target', data.stats.totalDownloads);
+                downloadElement.textContent = data.stats.totalDownloads.toLocaleString();
+            }
+            
+            // Also update the download card count
+            const cardDownloadElement = document.getElementById('cardDownloadCount');
+            if (cardDownloadElement) {
+                cardDownloadElement.textContent = data.stats.totalDownloads.toLocaleString();
+            }
+            
+            if (tkElement) {
+                tkElement.setAttribute('data-target', data.stats.totalTkEarned.replace(' TK', ''));
+                tkElement.textContent = data.stats.totalTkEarned;
+            }
+            
+            if (tournamentElement) {
+                tournamentElement.setAttribute('data-target', data.stats.totalTournaments);
+                tournamentElement.textContent = data.stats.totalTournaments.toLocaleString();
+            }
+        } else {
+            // Show 0 when no data is available
+            const downloadElement = document.getElementById('downloadCount');
+            const tkElement = document.getElementById('tkEarned');
+            const tournamentElement = document.getElementById('tournamentCount');
+            
+            if (downloadElement) {
+                downloadElement.textContent = '0';
+            }
+            
+            // Also update the download card count
+            const cardDownloadElement = document.getElementById('cardDownloadCount');
+            if (cardDownloadElement) {
+                cardDownloadElement.textContent = '0';
+            }
+            if (tkElement) {
+                tkElement.textContent = '0 TK';
+            }
+            if (tournamentElement) {
+                tournamentElement.textContent = '0';
+            }
+        }
+    } catch (error) {
+        console.error('🥇 Error updating stats:', error);
+        console.error('🥇 Error details:', error.message);
+    }
+}
+
+// Setup download tracking
+function setupDownloadTracking() {
+    const downloadButton = document.getElementById('downloadBtn');
+    if (downloadButton) {
+        downloadButton.addEventListener('click', trackDownload);
+    }
+}
+
+// Track download when user clicks download button
+async function trackDownload() {
+    try {
+        console.log('🥇 Tracking download...');
+        const response = await fetch(`${BACKEND_URL}/api/track-download`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: 'anonymous',
+                deviceInfo: {
+                    platform: navigator.platform,
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    cookieEnabled: navigator.cookieEnabled
+                },
+                timestamp: Date.now()
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            console.log('🥇 Download tracked successfully! Total downloads:', data.totalDownloads);
+            
+            // Update the download count immediately
+            const downloadElement = document.getElementById('downloadCount');
+            const cardDownloadElement = document.getElementById('cardDownloadCount');
+            
+            if (downloadElement) {
+                downloadElement.textContent = data.totalDownloads.toLocaleString();
+            }
+            if (cardDownloadElement) {
+                cardDownloadElement.textContent = data.totalDownloads.toLocaleString();
+            }
+            
+            // Show success message
+            showNotification('Download started! 🥇', 'success');
+        }
+    } catch (error) {
+        console.error('Error tracking download:', error);
+        showNotification('Download started! (Tracking failed)', 'info');
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span>${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        max-width: 300px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
+    
+    // Close button functionality
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', () => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    });
+}
 
 // Navigation Toggle
 const navToggle = document.getElementById('navToggle');
