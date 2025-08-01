@@ -32,8 +32,24 @@ function animateCounters() {
     counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-target'));
         const duration = 2000;
-        const increment = target / (duration / 16);
+        
+        // Get current displayed value
+        let currentText = counter.textContent;
         let current = 0;
+        
+        // Parse current value (remove "TK" and commas)
+        if (counter.id === 'tkEarned') {
+            current = parseInt(currentText.replace(' TK', '').replace(/,/g, ''));
+        } else {
+            current = parseInt(currentText.replace(/,/g, ''));
+        }
+        
+        // If current is already at target, no need to animate
+        if (current >= target) {
+            return;
+        }
+        
+        const increment = (target - current) / (duration / 16);
         
         const updateCounter = () => {
             if (current < target) {
